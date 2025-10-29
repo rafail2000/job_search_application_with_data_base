@@ -47,7 +47,9 @@ class Vacancy(AbstractVacancy):
     def validate_salary(salary: dict) -> (float, bool):
         """ Проверка наличия зарплаты вакансии """
 
-        if salary.get('salary').get('from'):
+        if not salary.get('salary'):
+            return
+        elif salary.get('salary').get('from'):
             return salary['salary']['from']
         elif salary.get('salary').get('to'):
             return salary['salary']['to']
