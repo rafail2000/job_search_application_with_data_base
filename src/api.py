@@ -37,21 +37,3 @@ class HeadHunterAPI(AbstractHeadHunterAPI):
             vacancies = self.load_vacancies(v)
             self.companies.append(Company(k, v, [Vacancy(i) for i in vacancies]))
 
-
-
-
-
-
-
-
-
-
-        #
-        # self.params['text'] = keyword
-        # while self.params.get('page') != 20:
-        #     response = requests.get(self.url, headers=self.headers, params=self.params)
-        #     if self._validate_status_cod(response):
-        #         break
-        #     vacancies = response.json()['items']
-        #     self.vacancies.extend(vacancies)
-        #     self.params['page'] += 1

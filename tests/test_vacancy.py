@@ -6,10 +6,12 @@ def test_vacancy_init(raw_vacancy):
 
     vacancy1 = Vacancy(raw_vacancy[0])
     vacancy2 = Vacancy(raw_vacancy[1])
+    vacancy3 = Vacancy(raw_vacancy[2])
 
     assert vacancy1.vacancy_name == "Куратор студентов"
     assert vacancy1.salary == 50000
     assert vacancy2.salary == 50000
+    assert vacancy3.salary is None
     assert vacancy1.url == "https://api.hh.ru/vacancies/125673844?host=hh.ru"
 
 def test_vacancy_repr(raw_vacancy):

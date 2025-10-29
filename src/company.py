@@ -4,8 +4,6 @@ from abc import ABC
 class AbstractCompany(ABC):
     """ Абстрактный класс компании """
 
-    pass
-
 
 class Company(AbstractCompany):
     """ Класс компания """
