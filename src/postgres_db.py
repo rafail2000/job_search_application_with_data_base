@@ -12,6 +12,8 @@ class PostgresDB:
                  host: str='localhost',
                  port: str='5432') -> None:
 
+        self.cur = None
+        self.conn = None
         self.dbname = dbname
         self.user = user
         self.password = password
@@ -94,7 +96,111 @@ class PostgresDB:
                         VALUES (%s, %s, %s, %s)""",
                         (counter, vacancy.vacancy_name, vacancy.salary, vacancy.url)
                     )
-        counter = 0
 
         self.cur.close()
         self.conn.close()
+
+    def get_companies_and_vacancies_count(self):
+        """ Получает список всех компаний и количество вакансий у каждой компании. """
+
+        self.conn = self._connect_to_database(self.dbname)
+        self.cur = self.conn.cursor()
+        with self.conn:
+            self.cur.execute(f"""SELECT company_name, COUNT(*)
+            FROM companies
+            JOIN vacancies USING(company_id)
+            GROUP BY company_name;"""
+                             )
+        data = self.cur.fetchall()
+        data_dict = [{"company": d[0], "count_vacancy": d[1]} for d in data]
+        self.cur.close()
+        self.conn.close()
+
+        return data_dict
+
+    def get_all_vacancies(self):
+        """
+        Получает список всех вакансий с указанием названия компании,
+        названия вакансии и зарплаты и ссылки на вакансию.
+        """
+
+        self.conn = self._connect_to_database(self.dbname)
+        self.cur = self.conn.cursor()
+        with self.conn:
+            self.cur.execute(f"""SELECT company_name, vacancy_name, salary, url
+            FROM companies
+            JOIN vacancies USING(company_id);
+            """
+                             )
+        data = self.cur.fetchall()
+        data_dict = [{"company_name": d[0], "vacancy_name": d[1], "salary": d[2], "url": d[3]} for d in data]
+        self.cur.close()
+        self.conn.close()
+
+        return data_dict
+
+    def get_avg_salary(self):
+        """
+        Получает среднюю зарплату по вакансиям.
+        """
+
+        self.conn = self._connect_to_database(self.dbname)
+        self.cur = self.conn.cursor()
+        with self.conn:
+            self.cur.execute(f"""SELECT vacancy_name, AVG(salary)
+            FROM vacancies
+            WHERE salary IS NOT NULL
+            GROUP BY vacancy_name;
+            
+            """
+                             )
+        data = self.cur.fetchall()
+        data_dict = [{"vacancy_name": d[0], "AVG(salary)": d[1]} for d in data]
+        self.cur.close()
+        self.conn.close()
+
+        return data_dict
+
+    def get_vacancies_with_higher_salary(self):
+        """
+        Получает список всех вакансий, у которых
+        зарплата выше средней по всем вакансиям.
+        """
+
+        self.conn = self._connect_to_database(self.dbname)
+        self.cur = self.conn.cursor()
+        with self.conn:
+            self.cur.execute(f"""
+            SELECT vacancy_name
+            FROM vacancies
+            WHERE salary IS NOT NULL and salary > (SELECT AVG(salary) FROM vacancies WHERE salary IS NOT NULL);
+            """
+                             )
+        data = self.cur.fetchall()
+        data_dict = [{"vacancy_name": d[0]} for d in data]
+        self.cur.close()
+        self.conn.close()
+
+        return data_dict
+
+    def get_vacancies_with_keyword(self, keyword: str):
+        """
+        Получает список всех вакансий, в названии которых
+        содержатся переданные в метод слова, например python.
+        """
+
+        self.conn = self._connect_to_database(self.dbname)
+        self.cur = self.conn.cursor()
+        with self.conn:
+            self.cur.execute(f"""
+            SELECT vacancy_name
+            FROM vacancies
+            WHERE vacancy_name LIKE '{keyword}';
+            """
+                             )
+        data = self.cur.fetchall()
+        data_dict = [{"vacancy_name": d[0]} for d in data]
+        self.cur.close()
+        self.conn.close()
+
+        return data_dict

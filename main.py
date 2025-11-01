@@ -25,6 +25,11 @@ def main():
 
     db = PostgresDB(**db_config)
     db.insert_data(hh.companies)
+    print(db.get_companies_and_vacancies_count())
+    print(db.get_all_vacancies())
+    print(db.get_avg_salary())
+    print(db.get_vacancies_with_higher_salary())
+    print(db.get_vacancies_with_keyword('Бухгалтер'))
 
 
 
